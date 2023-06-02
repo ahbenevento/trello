@@ -167,6 +167,26 @@ func TestCreateCard(t *testing.T) {
 	}
 }
 
+func TestSetCustomField(t *testing.T) {
+	c := testClient()
+	server := NewMockResponder(t)
+
+	defer server.Close()
+
+	c.BaseURL = server.URL()
+
+	cfItem := CustomFieldItem{
+		Value:       NewCustomFieldValue("probando"),
+		IDModel:     "57f5183c691585658d408681",
+		IDModelType: "card",
+	}
+
+	err := c.SetCustomField(&cfItem)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestAddCardToList(t *testing.T) {
 	l := testList(t)
 
@@ -337,7 +357,6 @@ func TestCardSetClient(t *testing.T) {
 }
 
 // Utility function to get a simple response from Client.GetCard()
-//
 func testCard(t *testing.T) *Card {
 	c := testClient()
 	server := NewMockResponder(t, "cards", "card-api-example.json")

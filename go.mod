@@ -1,6 +1,6 @@
-module github.com/adlio/trello
+module github.com/ahbenevento/trello
 
-go 1.13
+go 1.20
 
 require (
 	github.com/pkg/errors v0.8.1

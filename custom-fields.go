@@ -18,6 +18,25 @@ type CustomFieldItem struct {
 	IDModelType   string           `json:"modelType,omitempty"`
 }
 
+func (c *Client) SetCustomField(cfi *CustomFieldItem, extraArgs ...Arguments) (err error) {
+	path := fmt.Sprintf("cards/%s/customFields/%s/item", cfi.IDModel, cfi.IDCustomField)
+	value, err := json.Marshal(cfi.Value)
+
+	if err != nil {
+		return
+	}
+
+	args := Arguments{
+		"value": string(value),
+	}
+
+	args.flatten(extraArgs)
+
+	response := ""
+	err = c.Put(path, args, &response)
+	return
+}
+
 // CustomFieldValue represents the custom field value struct
 type CustomFieldValue struct {
 	val interface{}
