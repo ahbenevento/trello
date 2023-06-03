@@ -19,7 +19,7 @@ type CustomFieldItem struct {
 }
 
 func (c *Client) SetCustomField(cfi *CustomFieldItem, extraArgs ...Arguments) error {
-	path := fmt.Sprintf("cards/%s/customFields/%s/item", cfi.IDModel, cfi.IDCustomField)
+	path := fmt.Sprintf("cards/%s/customField/%s/item", cfi.IDModel, cfi.IDCustomField)
 	args := flattenArguments(extraArgs)
 	value := CustomFieldItem{
 		Value: NewCustomFieldValue(cfval{
