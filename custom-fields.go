@@ -18,7 +18,7 @@ type CustomFieldItem struct {
 	IDModelType   string           `json:"modelType,omitempty"`
 }
 
-func (c *Client) SetCustomField(cfi *CustomFieldItem, extraArgs ...Arguments) (err error) {
+func (c *Client) SetCustomField(cfi *CustomFieldItem, extraArgs ...Arguments) error {
 	path := fmt.Sprintf("cards/%s/customFields/%s/item", cfi.IDModel, cfi.IDCustomField)
 	args := flattenArguments(extraArgs)
 	value := CustomFieldItem{
@@ -26,9 +26,8 @@ func (c *Client) SetCustomField(cfi *CustomFieldItem, extraArgs ...Arguments) (e
 			Text: cfi.Value.String(),
 		}),
 	}
-	fmt.Printf("%+v\n", value)
-	err = c.Put(path, args, &value)
-	return
+
+	return c.PutJSON(path, args, value, nil)
 }
 
 // CustomFieldValue represents the custom field value struct
@@ -86,6 +85,8 @@ switchVal:
 		return json.Marshal(cfval{Checked: "false"})
 	case time.Time:
 		return json.Marshal(cfval{Date: v.Format(timeFmt)})
+	case cfval:
+		return json.Marshal(v)
 	default:
 		return nil, fmt.Errorf("unsupported type")
 	}

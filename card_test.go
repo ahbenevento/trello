@@ -169,16 +169,16 @@ func TestCreateCard(t *testing.T) {
 
 func TestSetCustomField(t *testing.T) {
 	c := testClient()
-	server := NewMockResponder(t)
+	server := mockResponder{t: t}
 
 	defer server.Close()
 
 	c.BaseURL = server.URL()
-
 	cfItem := CustomFieldItem{
-		Value:       NewCustomFieldValue("probando"),
-		IDModel:     "57f5183c691585658d408681",
-		IDModelType: "card",
+		Value:         NewCustomFieldValue("probando"),
+		IDModel:       "57f5183c691585658d408681",
+		IDCustomField: "57f5183c691585658d408681",
+		IDModelType:   "card",
 	}
 
 	err := c.SetCustomField(&cfItem)

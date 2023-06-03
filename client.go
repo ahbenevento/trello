@@ -242,6 +242,39 @@ func (c *Client) Delete(path string, args Arguments, target interface{}) error {
 	return c.do(req, url, target)
 }
 
+func (c *Client) PutJSON(path string, args Arguments, source, target interface{}) error {
+	c.Throttle()
+
+	params := args.ToURLValues()
+	body, err := json.Marshal(source)
+
+	if err != nil {
+		return errors.Wrapf(err, "Invalid JSON data")
+	}
+
+	c.log("[trello] PUT-JSON %s?%s %s", path, params.Encode(), string(body))
+
+	if c.Key != "" {
+		params.Set("key", c.Key)
+	}
+
+	if c.Token != "" {
+		params.Set("token", c.Token)
+	}
+
+	url := fmt.Sprintf("%s/%s", c.BaseURL, path)
+	urlWithParams := fmt.Sprintf("%s?%s", url, params.Encode())
+
+	req, err := http.NewRequest(http.MethodPut, urlWithParams, bytes.NewBuffer(body))
+
+	if err != nil {
+		return errors.Wrapf(err, "Invalid PUT request %s", url)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	return c.do(req, url, target)
+}
+
 func (c *Client) log(format string, args ...interface{}) {
 	if c.Logger != nil {
 		c.Logger.Debugf(format, args...)
