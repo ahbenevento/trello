@@ -289,6 +289,8 @@ func (c *Client) do(req *http.Request, url string, target interface{}) error {
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return makeHTTPClientError(url, resp)
+	} else if target == nil {
+		return nil
 	}
 
 	b, err := ioutil.ReadAll(resp.Body)
