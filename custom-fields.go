@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 )
+
+//  //  //
 
 // CustomFieldItem represents the custom field items of Trello a trello card.
 type CustomFieldItem struct {
@@ -18,16 +22,28 @@ type CustomFieldItem struct {
 	IDModelType   string           `json:"modelType,omitempty"`
 }
 
-func (c *Client) SetCustomField(cfi *CustomFieldItem, extraArgs ...Arguments) error {
-	path := fmt.Sprintf("cards/%s/customField/%s/item", cfi.IDModel, cfi.IDCustomField)
-	args := flattenArguments(extraArgs)
-	value := CustomFieldItem{
-		Value: NewCustomFieldValue(cfval{
-			Text: cfi.Value.String(),
-		}),
+func (c *Client) SetCustomFieldByItem(cfi CustomFieldItem, extraArgs ...Arguments) error {
+	if cfi.IDModelType != "" && cfi.IDModelType != "card" {
+		return errors.Errorf("unsupported model type: %s", cfi.IDModelType)
 	}
 
-	return c.PutJSON(path, args, value, nil)
+	path := fmt.Sprintf("cards/%s/customField/%s/item", cfi.IDModel, cfi.IDCustomField)
+	args := flattenArguments(extraArgs)
+	cfValue := CustomFieldItem{
+		Value: cfi.Value,
+	}
+
+	return c.PutJSON(path, args, cfValue, nil)
+}
+
+func (c *Client) SetCustomField(cardID, customFieldID string, value any, extraArgs ...Arguments) error {
+	path := fmt.Sprintf("cards/%s/customField/%s/item", cardID, customFieldID)
+	args := flattenArguments(extraArgs)
+	cfValue := CustomFieldItem{
+		Value: NewCustomFieldValue(value),
+	}
+
+	return c.PutJSON(path, args, cfValue, nil)
 }
 
 // CustomFieldValue represents the custom field value struct

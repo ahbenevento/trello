@@ -178,10 +178,14 @@ func TestSetCustomField(t *testing.T) {
 		Value:         NewCustomFieldValue("probando"),
 		IDModel:       "57f5183c691585658d408681",
 		IDCustomField: "57f5183c691585658d408681",
-		IDModelType:   "card",
 	}
 
-	err := c.SetCustomField(&cfItem)
+	err := c.SetCustomFieldByItem(cfItem)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = c.SetCustomField(cfItem.ID, cfItem.IDCustomField, "otra prueba")
 	if err != nil {
 		t.Error(err)
 	}
