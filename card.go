@@ -95,7 +95,6 @@ type Card struct {
 // where a Card which wasn't created from an API call to be used as the basis
 // for other API calls. All nested structs (Actions, Attachments, Checklists,
 // etc) also have their client properties updated.
-//
 func (c *Card) SetClient(newClient *Client) {
 	c.client = newClient
 
@@ -241,8 +240,23 @@ func (c *Card) MoveToBottomOfList() error {
 
 // Update UPDATEs the card's attributes.
 func (c *Card) Update(extraArgs ...Arguments) error {
-	args := flattenArguments(extraArgs)
 	path := fmt.Sprintf("cards/%s", c.ID)
+	args := flattenArguments(extraArgs)
+	values := map[string]string{
+		"name":      c.Name,
+		"desc":      c.Desc,
+		"pos":       strconv.FormatFloat(c.Pos, 'g', -1, 64),
+		"idList":    c.IDList,
+		"idMembers": strings.Join(c.IDMembers, ","),
+		"idLabels":  strings.Join(c.IDLabels, ","),
+	}
+
+	for property, value := range values {
+		if _, ok := args[property]; !ok {
+			args[property] = value
+		}
+	}
+
 	return c.client.Put(path, args, c)
 }
 
@@ -318,9 +332,9 @@ func (l *List) AddCard(card *Card, extraArgs ...Arguments) error {
 // CopyToList takes a list id and Arguments and returns the matching Card.
 // The following Arguments are supported.
 //
-//	Arguments["keepFromSource"] = "all"
-//  Arguments["keepFromSource"] = "none"
-//	Arguments["keepFromSource"] = "attachments,checklists,comments"
+//		Arguments["keepFromSource"] = "all"
+//	 Arguments["keepFromSource"] = "none"
+//		Arguments["keepFromSource"] = "attachments,checklists,comments"
 func (c *Card) CopyToList(listID string, extraArgs ...Arguments) (*Card, error) {
 	args := Arguments{
 		"idList":       listID,
