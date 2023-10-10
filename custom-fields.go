@@ -89,6 +89,10 @@ switchVal:
 		}
 		goto switchVal
 	case string:
+		if v == "" {
+			return json.Marshal("")
+		}
+
 		return json.Marshal(cfval{Text: v})
 	case int, int64:
 		return json.Marshal(cfval{Number: fmt.Sprintf("%d", v)})
